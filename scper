@@ -7,6 +7,10 @@ import re
 import subprocess
 import sys
 
+def current_dir_name():
+    x = os.getcwd().split("/")
+    return x[len(x)-1]
+
 def to_dict(xs):
     dict = {}
     for x in xs:
@@ -15,7 +19,10 @@ def to_dict(xs):
     return dict    
 
 def secret_file_path():
-    file_path = "/usr/local/etc/scper/secrets"
+    dir_name  = current_dir_name()
+    file_path = "/usr/local/etc/scper/{}/secrets".format(current_dir_name())
+    if (os.path.isdir(dir_name)):
+        shell("mkdir -p {}".format(dir_name))
     if not (os.path.isfile(file_path)):
         sys.exit("you need to add {}".format(file_path))
     return file_path    
