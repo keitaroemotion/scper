@@ -18,10 +18,6 @@ def to_dict(xs):
             dict[x[0]] = str(x[1])
     return dict    
 
-def trim_path(path):
-    d = current_dir_name()
-    return path.replace("{}{}".format(d, d), d)
-
 def secret_file_path():
     dir_name  = current_dir_name()
     dir_path  = "/usr/local/etc/scper/{}".format(current_dir_name())
@@ -53,7 +49,7 @@ def command_to_move_scp_file(key, user, ip, file, base_dir):
     return "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file)
 
 def command_to_move_diffs(key, user, ip, base_dir, files):
-    return trim_path(";".join(map(lambda file: "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file), files)))
+    return (";".join(map(lambda file: "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file), files)))
 
 def command_to_scp_r(key, user, ip, base_dir, dir):
     return "scp -i {} -r {} {}@{}:{}/{}".format(key, dir, user, ip, base_dir, dir)
