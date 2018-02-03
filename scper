@@ -2,6 +2,8 @@
 
 from itertools import izip
 import os
+import re
+import subprocess
 import sys
 
 def to_dict(xs):
@@ -20,6 +22,9 @@ def command_to_aws(key, user, ip):
 def command_to_move_scp_file(key, user, ip, file, base_dir):
     return "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file)
 
+def command_to_move_diffs(key, user, ip, base_dir, files):
+    return ";".join(map(lambda file: "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file), files))
+
 def shell(command):
     print(command)
     os.system(command)
@@ -29,12 +34,17 @@ def help():
     print("-h             ... help menu")
     print("-g             ... go to aws")
     print("-f [file_path] ... scp send a file")
+    print("-d             ... scp send a file of git status new file|modified")
     print("")
 
 def raise_error(arg_target, another_condition = True):
     if len(sys.argv) < arg_target + 1 and another_condition:
         help()
         sys.exit("you need argument")
+
+def git_status():
+    status = str(subprocess.check_output(['git', 'status'])).split("\n")
+    return map(lambda l: max(l.split(":   ")), filter(lambda l: l.startswith("\tnew file") or l.startswith("\tmodified"), status))
 
 secrets  = to_dict(get_secrets())
 key      = secrets["key"]
@@ -45,12 +55,14 @@ base_dir = secrets["base_dir"]
 raise_error(1)
 option  = sys.argv[1]
 
-raise_error(2, option == "-f")
-file    = sys.argv[2]
+if option == "-f":
+    raise_error(2)
+    file = sys.argv[2]
 
 options = {
+    "-d": command_to_move_diffs(key, user, ip, base_dir, git_status()),
     "-g": command_to_aws(key, user, ip),
-    "-f": command_to_move_scp_file(key, user, ip, file, base_dir)
+    "-f": command_to_move_scp_file(key, user, ip, file, base_dir),
 }
 
 command = (options.get(option, None))
