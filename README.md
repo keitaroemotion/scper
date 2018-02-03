@@ -36,12 +36,12 @@ $ installer
 
 ```
 scper -h             ... help menu
-scper -g             ... go to aws")
-scper -f [file_path] ... scp send a file")
-scper -b [file_path] ... scp bring a file")
-scper -d             ... scp send a file of git status new file|modified")
-scper -r [dir_path]  ... scp send files recursively")
-scper -t [command]   ... scp remotely execute arbiterary command")
+scper -g             ... go to aws
+scper -f [file_path] ... scp send a file
+scper -b [file_path] ... scp bring a file
+scper -d             ... scp send a file of git status new file|modified
+scper -r [dir_path]  ... scp send files recursively
+scper -t [command]   ... scp remotely execute arbiterary command
 ```
 
 # Author
