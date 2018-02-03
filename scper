@@ -25,6 +25,12 @@ def command_to_move_scp_file(key, user, ip, file, base_dir):
 def command_to_move_diffs(key, user, ip, base_dir, files):
     return ";".join(map(lambda file: "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file), files))
 
+def command_to_scp_r(key, user, ip, base_dir, dir):
+    return "scp -i {} -r {} {}@{}:{}/{}".format(key, dir, user, ip, base_dir, dir)
+   
+def command_to_remotely_execute(key, user, ip, base_dir, command):
+    return "ssh -i {} {}@{} \"cd {}; {}\"".format(key, user, ip, base_dir, command)
+
 def shell(command):
     print(command)
     os.system(command)
@@ -35,6 +41,8 @@ def help():
     print("-g             ... go to aws")
     print("-f [file_path] ... scp send a file")
     print("-d             ... scp send a file of git status new file|modified")
+    print("-r [dir_path]  ... scp send files recursively")
+    print("-t [command]   ... scp remotely execute arbiterary command")
     print("")
 
 def raise_error(arg_target, another_condition = True):
@@ -55,14 +63,16 @@ base_dir = secrets["base_dir"]
 raise_error(1)
 option  = sys.argv[1]
 
-if option == "-f":
+if option == "-f" or option == "-r" or option == "-t":
     raise_error(2)
-    file = sys.argv[2]
+    argv_2 = sys.argv[2]
 
 options = {
     "-d": command_to_move_diffs(key, user, ip, base_dir, git_status()),
     "-g": command_to_aws(key, user, ip),
-    "-f": command_to_move_scp_file(key, user, ip, file, base_dir),
+    "-f": command_to_move_scp_file(key, user, ip, argv_2, base_dir),
+    "-r": command_to_scp_r(key, user, ip, base_dir, argv_2),
+    "-t": command_to_remotely_execute(key, user, ip, base_dir, argv_2),
 }
 
 command = (options.get(option, None))
