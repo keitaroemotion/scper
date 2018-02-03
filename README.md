@@ -1,6 +1,6 @@
 # scper
 
-A tool to easily operate SSH/SCP command.
+A tool to easily operate *SSH/SCP* command.
 The deployment of source files to the remote instance, such as the
 EC2 instance of Amazon Web Service(AWS), causes the pain in the ass
 since you need to mess with the ssh/scp command, and each time
@@ -21,9 +21,9 @@ synchronization for you.
 
 You should have the following environent.
 
-MacOSX Sierra
-git(installed and available via the terminal)
-python 2.7.x
+- MacOSX Sierra
+- git(installed and available via the terminal)
+- python 2.7.x
 
 ## Installation
 
