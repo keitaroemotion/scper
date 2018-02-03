@@ -18,6 +18,10 @@ def to_dict(xs):
             dict[x[0]] = str(x[1])
     return dict    
 
+def reduce(path):
+    ps = path.split("/")
+    return "/".join(ps[0:len(ps)-1])
+
 def secret_file_path():
     dir_name  = current_dir_name()
     dir_path  = "/usr/local/etc/scper/{}".format(current_dir_name())
@@ -46,10 +50,13 @@ def command_to_aws(key, user, ip):
     return "ssh -i {} {}@{}".format(key, user, ip)
 
 def command_to_move_scp_file(key, user, ip, file, base_dir):
-    return "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file)
+    return "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, (base_dir), file)
+
+def command_to_bring_scp_file(key, user, ip, file, base_dir):
+    return "scp -i {} {}@{}:{}/{} {}".format(key, user, ip, reduce(base_dir), file, file)
 
 def command_to_move_diffs(key, user, ip, base_dir, files):
-    return (";".join(map(lambda file: "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file), files)))
+    return ";".join(map(lambda file: "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, reduce(base_dir), file), files))
 
 def command_to_scp_r(key, user, ip, base_dir, dir):
     return "scp -i {} -r {} {}@{}:{}/{}".format(key, dir, user, ip, base_dir, dir)
@@ -66,6 +73,7 @@ def help():
     print("-h             ... help menu")
     print("-g             ... go to aws")
     print("-f [file_path] ... scp send a file")
+    print("-b [file_path] ... scp bring a file")
     print("-d             ... scp send a file of git status new file|modified")
     print("-r [dir_path]  ... scp send files recursively")
     print("-t [command]   ... scp remotely execute arbiterary command")
@@ -90,13 +98,14 @@ raise_error(1)
 option  = sys.argv[1]
 
 argv_2 = ""
-if option == "-f" or option == "-r" or option == "-t":
+if option == "-f" or option == "-r" or option == "-t" or option == "-b" :
     raise_error(2)
     argv_2 = sys.argv[2]
 
 options = {
     "-d": command_to_move_diffs(key, user, ip, base_dir, git_status()),
     "-g": command_to_aws(key, user, ip),
+    "-b": command_to_bring_scp_file(key, user, ip, argv_2, base_dir),
     "-f": command_to_move_scp_file(key, user, ip, argv_2, base_dir),
     "-r": command_to_scp_r(key, user, ip, base_dir, argv_2),
     "-t": command_to_remotely_execute(key, user, ip, base_dir, argv_2),
