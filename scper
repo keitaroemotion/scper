@@ -20,10 +20,22 @@ def to_dict(xs):
 
 def secret_file_path():
     dir_name  = current_dir_name()
+    dir_path  = "/usr/local/etc/scper/{}".format(current_dir_name())
     file_path = "/usr/local/etc/scper/{}/secrets".format(current_dir_name())
-    if (os.path.isdir(dir_name)):
-        shell("mkdir -p {}".format(dir_name))
+    shell("mkdir -p {}".format(dir_path))
     if not (os.path.isfile(file_path)):
+        default = ("\n").join([
+            "ip=xxx.xxx.xx.xxx",
+            "user=username",
+            "port=443",
+            "key=/Users/someuser/somewhere/somewhere.pem",
+            "base_dir=/home/user/webrootdir",
+            "\n",
+        ])
+        shell("touch {}".format(file_path))
+        f= open(file_path, "w")
+        f.write(default)
+        f.close()
         sys.exit("you need to add {}".format(file_path))
     return file_path    
 
