@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+#
+# author: Kei Sugano <tobasojyo@gmail.com>
+#
+
+
 from itertools import izip
 import os
 import os.path
