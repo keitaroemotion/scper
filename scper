@@ -17,30 +17,43 @@ def get_secrets():
 def command_to_aws(key, user, ip):
     return "ssh -i {} {}@{}".format(key, user, ip)
 
+def command_to_move_scp_file(key, user, ip, file, base_dir):
+    return "scp -i {} {} {}@{}:{}/{}".format(key, file, user, ip, base_dir, file)
+
 def shell(command):
     print(command)
     os.system(command)
 
 def help():
     print("")
-    print("-h ... help menu")
-    print("-g ... go to aws")
+    print("-h             ... help menu")
+    print("-g             ... go to aws")
+    print("-f [file_path] ... scp send a file")
     print("")
 
-secrets = to_dict(get_secrets())
-key     = secrets["key"]
-user    = secrets["user"]
-ip      = secrets["ip"]
+def raise_error(arg_target, another_condition = True):
+    if len(sys.argv) < arg_target + 1 and another_condition:
+        help()
+        sys.exit("you need argument")
+
+secrets  = to_dict(get_secrets())
+key      = secrets["key"]
+user     = secrets["user"]
+ip       = secrets["ip"]
+base_dir = secrets["base_dir"]
+
+raise_error(1)
+option  = sys.argv[1]
+
+raise_error(2, option == "-f")
+file    = sys.argv[2]
 
 options = {
-    "-g": command_to_aws(key, user, ip)
+    "-g": command_to_aws(key, user, ip),
+    "-f": command_to_move_scp_file(key, user, ip, file, base_dir)
 }
 
-if len(sys.argv) < 2:
-    help()
-    sys.exit("you need argument")
-
-command = (options.get(sys.argv[1], None))
+command = (options.get(option, None))
 if command == None:
     help()
 else:
