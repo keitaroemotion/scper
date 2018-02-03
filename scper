@@ -22,6 +22,9 @@ def reduce(path):
     ps = path.split("/")
     return "/".join(ps[0:len(ps)-1])
 
+def configure_secret_file():
+    shell("vim {}".format(secret_file_path()))
+
 def secret_file_path():
     dir_name  = current_dir_name()
     dir_path  = "/usr/local/etc/scper/{}".format(current_dir_name())
@@ -71,6 +74,7 @@ def shell(command):
 def help():
     print("")
     print("-h             ... help menu")
+    print("-c             ... configure secret file")
     print("-g             ... go to aws")
     print("-f [file_path] ... scp send a file")
     print("-b [file_path] ... scp bring a file")
@@ -98,7 +102,7 @@ raise_error(1)
 option  = sys.argv[1]
 
 argv_2 = ""
-if option == "-f" or option == "-r" or option == "-t" or option == "-b" :
+if option == "-f" or option == "-r" or option == "-t" or option == "-b":
     raise_error(2)
     argv_2 = sys.argv[2]
 
@@ -112,7 +116,10 @@ options = {
 }
 
 command = (options.get(option, None))
-if command == None:
+
+if option == "-c":
+    configure_secret_file()
+elif command == None:
     help()
 else:
     shell(command)
